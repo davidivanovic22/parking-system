@@ -1,5 +1,5 @@
 import { ParkingSpotRepository } from "../repositories/ParkingSpotRepository";
-import { IParkingSpotService } from "./interfaces/IParkingSpot";
+import { IParkingSpotService } from "./interfaces/IParkingSpotService";
 import { ParkingSpotBuilder } from "../builders/ParkingSpotBuilder";
 
 export class ParkingSpotService implements IParkingSpotService {

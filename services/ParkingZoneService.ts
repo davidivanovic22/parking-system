@@ -1,5 +1,5 @@
 import { ParkingZoneRepository } from "../repositories/ParkingZoneRepository";
-import { IParkingZoneService } from "./interfaces/IParkingZone";
+import { IParkingZoneService } from "./interfaces/IParkingZoneService";
 
 export class ParkingZoneService implements IParkingZoneService {
   private repo = new ParkingZoneRepository();

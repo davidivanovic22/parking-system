@@ -3,7 +3,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { User } from "../entities/User";
 import { Role } from "../entities/Role";
 import { Database } from "../config/Database";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import { IAuthService, RegisterDTO } from "./interfaces/IAuthService";
 
 export class AuthService implements IAuthService {
@@ -35,43 +35,43 @@ export class AuthService implements IAuthService {
     return this.roleRepo;
   }
 
-  async register(data: RegisterDTO) {
-    const { name, email, username, password, roles } = data;
-
-    if (!name || !email || !username || !password || !roles?.length) {
-      throw new Error("All fields and at least one role are required");
-    }
-
+  async register(data: RegisterDTO): Promise<{ message: string }> {
     const userRepo = this.getUserRepo();
     const roleRepo = this.getRoleRepo();
 
-    const existing = await userRepo.findOne({
-      where: [{ email }, { username }],
+    // Check if user with email or username already exists
+    const existingUser = await userRepo.findOne({
+      where: [{ email: data.email }, { username: data.username }],
     });
-
-    if (existing) {
-      throw new Error("User already exists");
+    if (existingUser) {
+      throw new Error("Email or username already in use");
     }
 
-    // Find roles, validate all roles are found
-    const foundRoles = await roleRepo.findByIds(roles);
-    if (foundRoles.length !== roles.length) {
-      throw new Error("Invalid role(s)");
+    // Trim password before hashing
+    const trimmedPassword = data.password.trim();
+
+    // Hash password once here
+    const hashedPassword = await bcrypt.hash(trimmedPassword, 10);
+
+    // Load roles by IDs
+    const roles = await roleRepo.findBy({ id: In(data.roles) });
+    if (roles.length !== data.roles.length) {
+      throw new Error("One or more roles are invalid");
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
+    // Create user entity with hashed password
     const user = userRepo.create({
-      name,
-      email,
-      username,
+      name: data.name,
+      email: data.email,
+      username: data.username,
       password: hashedPassword,
-      roles: foundRoles,
+      roles: roles,
     });
 
+    // Save to DB
     await userRepo.save(user);
 
-    return { message: "User registered" };
+    return { message: "User registered successfully" };
   }
 
   async login(email: string, password: string) {
@@ -79,14 +79,17 @@ export class AuthService implements IAuthService {
 
     const user = await userRepo.findOne({
       where: { email },
-      relations: ["roles"],
     });
 
     if (!user) {
       throw new Error("Invalid credentials");
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    // Trim input password for safety
+    const trimmedPassword = password.trim();
+
+    const isMatch = await bcrypt.compare(trimmedPassword, user.password);
+
     if (!isMatch) {
       throw new Error("Invalid credentials");
     }

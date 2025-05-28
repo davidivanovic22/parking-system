@@ -1,16 +1,15 @@
+import bcrypt from "bcrypt";
 import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  OneToMany,
-  ManyToMany,
-  JoinTable,
   BeforeInsert,
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
 } from "typeorm";
 import { RegistrationPlate } from "./RegistrationPlate";
 import { Role } from "./Role";
-import bcrypt from "bcrypt";
-import { Exclude } from "class-transformer";
 
 @Entity("USER")
 export class User {
@@ -40,8 +39,8 @@ export class User {
   })
   roles!: Role[];
 
-  @BeforeInsert()
-  async hashPassword() {
-    this.password = await bcrypt.hash(this.password, 10);
-  }
+  // @BeforeInsert()
+  // async hashPassword() {
+  //   this.password = await bcrypt.hash(this.password, 10);
+  // }
 }
