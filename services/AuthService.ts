@@ -50,9 +50,6 @@ export class AuthService implements IAuthService {
     // Trim password before hashing
     const trimmedPassword = data.password.trim();
 
-    // Hash password once here
-    const hashedPassword = await bcrypt.hash(trimmedPassword, 10);
-
     // Load roles by IDs
     const roles = await roleRepo.findBy({ id: In(data.roles) });
     if (roles.length !== data.roles.length) {
@@ -64,7 +61,7 @@ export class AuthService implements IAuthService {
       name: data.name,
       email: data.email,
       username: data.username,
-      password: hashedPassword,
+      password: trimmedPassword,
       roles: roles,
     });
 
