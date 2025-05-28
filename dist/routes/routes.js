@@ -1,0 +1,32 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const UserController_1 = require("../controllers/UserController");
+const ParkingZoneController_1 = require("../controllers/ParkingZoneController");
+const TicketController_1 = require("../controllers/TicketController");
+const PaymentController_1 = require("../controllers/PaymentController");
+const RoleController_1 = require("../controllers/RoleController");
+const RegistrationPlateController_1 = require("../controllers/RegistrationPlateController");
+const ParkingSpotContoller_1 = require("../controllers/ParkingSpotContoller");
+const authMiddleware_1 = require("../middleware/authMiddleware");
+const AuthController_1 = require("../controllers/AuthController");
+const router = (0, express_1.Router)();
+const authController = new AuthController_1.AuthController();
+router.use("/auth", authController.router);
+// ✅ Protect everything after this line
+router.use(authMiddleware_1.authMiddleware);
+const registerRoutes = (path, controller) => {
+    router.get(`/${path}`, controller.all.bind(controller));
+    router.get(`/${path}/:id`, controller.one.bind(controller));
+    router.post(`/${path}`, controller.save.bind(controller));
+    router.put(`/${path}/:id`, controller.update.bind(controller));
+    router.delete(`/${path}/:id`, controller.delete.bind(controller));
+};
+registerRoutes("users", new UserController_1.UserController());
+registerRoutes("roles", new RoleController_1.RoleController());
+registerRoutes("plates", new RegistrationPlateController_1.RegistrationPlateController());
+registerRoutes("zones", new ParkingZoneController_1.ParkingZoneController());
+registerRoutes("spots", new ParkingSpotContoller_1.ParkingSpotController());
+registerRoutes("tickets", new TicketController_1.TicketController());
+registerRoutes("payments", new PaymentController_1.PaymentController());
+exports.default = router;
