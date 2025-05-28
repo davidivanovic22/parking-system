@@ -15,7 +15,7 @@ config();
 export class Database {
   private static instance: DataSource | null = null;
 
-  private constructor() {} // prevent direct construction
+  private constructor() {}
 
   public static getInstance(): DataSource {
     if (!Database.instance) {
@@ -42,7 +42,6 @@ export class Database {
     return Database.instance;
   }
 
-  // Optional helper method to initialize once
   public static async initialize(): Promise<DataSource> {
     const dataSource = Database.getInstance();
     if (!dataSource.isInitialized) {
