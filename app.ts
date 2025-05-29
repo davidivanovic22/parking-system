@@ -1,8 +1,16 @@
-import express from "express";
 import cors from "cors";
+import express from "express";
 import mysql from "mysql2/promise";
-import routes from "./routes/routes";
+import swaggerUI from "swagger-ui-express";
 import { Database } from "./config/Database";
+import routes from "./routes/routes";
+import swaggerSpec from "./swagger";
+
+const swaggerUIOptions = {
+  swaggerOptions: {
+    persistAuthorization: true,
+  },
+};
 
 const app = express();
 app.use(cors({ origin: "http://localhost:3000", credentials: true }));
@@ -31,8 +39,23 @@ async function main() {
 
     app.use("/api", routes);
 
-    app.listen(3001, () => {
-      console.log("Server running on http://localhost:3001");
+    app.use(
+      "/api-docs",
+      swaggerUI.serve,
+      swaggerUI.setup(swaggerSpec, swaggerUIOptions)
+    );
+
+    app.get("/swagger.json", (req, res) => {
+      res.setHeader("Content-Type", "application/json");
+      res.send(swaggerSpec);
+    });
+
+    const PORT = 3001;
+    const swaggerUrl = `http://localhost:${PORT}/api-docs`;
+
+    app.listen(PORT, async () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+      console.log(`Swagger UI available at ${swaggerUrl}`);
     });
   } catch (error) {
     console.error("Error starting the server:", error);

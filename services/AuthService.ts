@@ -1,9 +1,9 @@
 import bcrypt from "bcrypt";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { User } from "../entities/User";
-import { Role } from "../entities/Role";
-import { Database } from "../config/Database";
 import { In, Repository } from "typeorm";
+import { Database } from "../config/Database";
+import { Role } from "../entities/Role";
+import { User } from "../entities/User";
 import { IAuthService, RegisterDTO } from "./interfaces/IAuthService";
 
 export class AuthService implements IAuthService {
@@ -74,15 +74,16 @@ export class AuthService implements IAuthService {
   async login(email: string, password: string) {
     const userRepo = this.getUserRepo();
 
+    // Fetch user and their roles
     const user = await userRepo.findOne({
       where: { email },
+      relations: ["roles"], // Include roles in the query
     });
 
     if (!user) {
       throw new Error("Invalid credentials");
     }
 
-    // Trim input password for safety
     const trimmedPassword = password.trim();
 
     const isMatch = await bcrypt.compare(trimmedPassword, user.password);
@@ -91,7 +92,12 @@ export class AuthService implements IAuthService {
       throw new Error("Invalid credentials");
     }
 
-    const payload: JwtPayload = { userId: user.id, email: user.email };
+    const roles = user.roles;
+
+    const payload: JwtPayload = {
+      email: user.email,
+      roles: roles,
+    };
 
     const accessToken = jwt.sign(payload, this.JWT_SECRET, {
       expiresIn: "15m",
