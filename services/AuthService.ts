@@ -110,8 +110,10 @@ export class AuthService implements IAuthService {
     try {
       const payload = jwt.verify(token, this.REFRESH_SECRET) as JwtPayload;
 
+      const roles = payload.roles;
+
       const newAccessToken = jwt.sign(
-        { userId: payload.userId, email: payload.email },
+        { email: payload.email, roles: roles },
         this.JWT_SECRET,
         { expiresIn: "15m" }
       );
