@@ -21,7 +21,6 @@ export class ParkingSpotBuilder {
 
   setZone(zone: ParkingZone): this {
     this.spot.zone = zone;
-    this.spot.zoneId = zone.id;
     return this;
   }
 

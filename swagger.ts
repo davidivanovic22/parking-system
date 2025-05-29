@@ -51,7 +51,7 @@ const options = {
           properties: {
             plateNumber: { type: "string", example: "ABC1234" },
             userId: { type: "integer", example: 1 },
-            // To avoid circular references, you can skip embedding user here or use $ref carefully
+            // Avoid embedding user to prevent circular references
           },
           required: ["plateNumber", "userId"],
         },
@@ -60,7 +60,6 @@ const options = {
           properties: {
             id: { type: "integer", example: 1 },
             name: { type: "string", example: "Admin" },
-            // users can be omitted or defined as array of User references if needed
           },
           required: ["name"],
         },
@@ -128,9 +127,9 @@ const options = {
             id: { type: "integer", example: 1 },
             street: { type: "string", example: "Main St" },
             isOccupied: { type: "boolean", example: false },
-            zoneId: { type: "integer", example: 1 },
+            zone: { $ref: "#/components/schemas/ParkingZone" },
           },
-          required: ["street", "isOccupied", "zoneId"],
+          required: ["street", "isOccupied", "zone"],
         },
       },
     },
@@ -140,7 +139,7 @@ const options = {
       },
     ],
   },
-  apis: ["./routes/routes.ts"],
+  apis: ["./routes/routes.ts"], // Your route files here
 };
 
 const swaggerSpec = swaggerJSDoc(options);

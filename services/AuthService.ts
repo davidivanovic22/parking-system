@@ -5,10 +5,12 @@ import { Database } from "../config/Database";
 import { Role } from "../entities/Role";
 import { User } from "../entities/User";
 import { IAuthService, RegisterDTO } from "./interfaces/IAuthService";
+import { UserService } from "./UserService";
 
 export class AuthService implements IAuthService {
   private dataSource = Database.getInstance();
 
+  private userService = new UserService();
   private userRepo: Repository<User> | null = null;
   private roleRepo: Repository<Role> | null = null;
 
@@ -47,26 +49,21 @@ export class AuthService implements IAuthService {
       throw new Error("Email or username already in use");
     }
 
-    // Trim password before hashing
-    const trimmedPassword = data.password.trim();
-
     // Load roles by IDs
     const roles = await roleRepo.findBy({ id: In(data.roles) });
     if (roles.length !== data.roles.length) {
       throw new Error("One or more roles are invalid");
     }
 
-    // Create user entity with hashed password
-    const user = userRepo.create({
-      name: data.name,
-      email: data.email,
-      username: data.username,
-      password: trimmedPassword,
-      roles: roles,
-    });
+    // Use UserService.createUser to create the user with hashed password
+    const userEntity = new User();
+    userEntity.name = data.name;
+    userEntity.email = data.email;
+    userEntity.username = data.username;
+    userEntity.password = data.password; // raw password; UserService will hash it
+    userEntity.roles = roles;
 
-    // Save to DB
-    await userRepo.save(user);
+    await this.userService.createUser(userEntity);
 
     return { message: "User registered successfully" };
   }

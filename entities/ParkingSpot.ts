@@ -4,6 +4,7 @@ import {
   Column,
   ManyToOne,
   OneToMany,
+  JoinColumn,
 } from "typeorm";
 
 import { ParkingZone } from "./ParkingZone";
@@ -21,10 +22,8 @@ export class ParkingSpot {
   isOccupied!: boolean;
 
   @ManyToOne(() => ParkingZone, (zone) => zone.spots)
+  @JoinColumn({ name: "ZONE_ID" }) // here is the FK column name in DB
   zone!: ParkingZone;
-
-  @Column({ name: "ZONE_ID" })
-  zoneId!: number;
 
   @OneToMany(() => Payment, (payment) => payment.spot)
   payments!: Payment[];

@@ -1,6 +1,7 @@
 import { ParkingSpotRepository } from "../repositories/ParkingSpotRepository";
 import { IParkingSpotService } from "./interfaces/IParkingSpotService";
 import { ParkingSpotBuilder } from "../builders/ParkingSpotBuilder";
+import { ParkingSpot } from "../entities/ParkingSpot";
 
 export class ParkingSpotService implements IParkingSpotService {
   private repo = new ParkingSpotRepository();
@@ -13,7 +14,7 @@ export class ParkingSpotService implements IParkingSpotService {
     return this.repo.findById(id);
   }
 
-  async createSpot(data: any) {
+  async createSpot(data: ParkingSpot) {
     const spot = new ParkingSpotBuilder()
       .setStreet(data.street)
       .setIsOccupied(data.isOccupied)
@@ -23,7 +24,7 @@ export class ParkingSpotService implements IParkingSpotService {
     return this.repo.save(this.repo.create(spot));
   }
 
-  async updateSpot(id: number, data: any) {
+  async updateSpot(id: number, data: ParkingSpot) {
     const spot = await this.repo.findById(id);
     if (!spot) return null;
 
