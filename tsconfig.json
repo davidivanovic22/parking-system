@@ -7,7 +7,8 @@
     "esModuleInterop": true,
     "strict": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "types": ["jest"],
   },
   "include": [
     "config/**/*",
@@ -15,5 +16,5 @@
     "controllers/**/*",
     "entities/**/*",
     "app.ts"
-, "services/interfaces", "services/interfaces"  ]
+, "services/interfaces", "services/interfaces", "tests/UserService.spec.ts"  ]
 }
