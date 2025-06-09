@@ -15,6 +15,8 @@
     "services/**/*",
     "controllers/**/*",
     "entities/**/*",
+    "exceptions/**/*",
+    "tests/**/*",
     "app.ts"
 , "services/interfaces", "services/interfaces", "tests/UserService.spec.ts"  ]
 }
